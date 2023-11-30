@@ -1,10 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { EmpleadoEntity } from './entities/empleado.entity';
-import { CreateEmpleadoDto } from './dto/create-empleado.dto';
-import { UpdateEmpleadoDto } from './dto/update-empleado.dto';
-
+import { InjectRepository } from "@nestjs/typeorm";
+import { UpdateEmpleadoDto } from "./dto/update-empleado.dto";
+import { Injectable } from "@nestjs/common";
+import { EmpleadoEntity } from "./entities/empleado.entity";
+import { EntityManager, Repository } from "typeorm";
+import { CreateEmpleadoDto } from "./dto/create-empleado.dto";
 
 @Injectable()
 export class EmpleadoService {
@@ -12,6 +11,7 @@ export class EmpleadoService {
   constructor(
     @InjectRepository(EmpleadoEntity)
     private empleadoRepository: Repository<EmpleadoEntity>,
+    private entityManager: EntityManager,
   ) {}
 
   async create(createEmpleadoDto: CreateEmpleadoDto) {
@@ -19,24 +19,36 @@ export class EmpleadoService {
     return await this.empleadoRepository.save(empleado);
   }
 
-  createzz(createempleadoDto: CreateEmpleadoDto) {
-    return 'This action adds a new empleado';
+  async findAll() {
+    return await this.empleadoRepository.find(); // Devuelve todos los empleados
   }
 
-  findAll() {
-    return `This action returns all empleados`;
+  async findOne(id:string) {
+    const empleadop = await this.empleadoRepository.findOne({ where: {id} });
+
+    return empleadop;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} empleado`;
+  async update(id, updateEmpleadoDto: UpdateEmpleadoDto) {
+    const empleado = await this.empleadoRepository.findOne(id);
+    if (!empleado) {
+      throw new Error(`Empleado con ID ${id} no encontrado`);
+    }
+
+    // Actualiza los campos del empleado con los datos del DTO
+    Object.assign(empleado, updateEmpleadoDto);
+
+    return await this.empleadoRepository.save(empleado);
   }
 
-  update(id: number, UpdateEmpleadoDto: UpdateEmpleadoDto) {
-    return `This action updates a #${id} empleado`;
+  async delete(id: string) {
+    let empleado = await this.findOne(id);
+    if(empleado){
+      const empleados = this.empleadoRepository.delete({id});
+      return "ya esta";
+    }
+    else{
+      return "no existe";
+    }
   }
-
-  remove(id: number) {
-    return `This action removes a #${id} empleado`;
   }
-}
-

@@ -1,8 +1,7 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { EmpleadoService } from './empleados.service';
-import { CreateEmpleadoDto } from './dto/create-empleado.dto';
-import { UpdateEmpleadoDto } from './dto/update-empleado.dto';
-import { Repository } from 'typeorm';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from "@nestjs/common";
+import { EmpleadoService } from "./empleados.service";
+import { CreateEmpleadoDto } from "./dto/create-empleado.dto";
+import { UpdateEmpleadoDto } from "./dto/update-empleado.dto";
 
 @Controller('empleados')
 export class EmpleadosController {
@@ -13,23 +12,23 @@ export class EmpleadosController {
     return this.empleadosService.create(createEmpleadoDto);
   }
 
-  // @Get()
-  // findAll() {
-  //   return this.empleadosService.findAll();
-  // }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.empleadosService.findOne(+id);
+  @Get()
+  async findAll() {
+    return this.empleadosService.findAll();
   }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateEmpleadoDto: UpdateEmpleadoDto) {
-  //   return this.empleadosService.update(+id, updateEmpleadoDto);
-  // }
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    return this.empleadosService.findOne(id);
+  }
+
+  @Patch(':id')
+  async update(@Param('id') id: string, @Body() updateEmpleadoDto: UpdateEmpleadoDto) {
+    return this.empleadosService.update(id, updateEmpleadoDto);
+  }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.empleadosService.remove(+id);
+    return this.empleadosService.delete(id);
   }
 }
