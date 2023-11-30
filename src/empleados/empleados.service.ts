@@ -2,8 +2,8 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { UpdateEmpleadoDto } from "./dto/update-empleado.dto";
 import { Injectable } from "@nestjs/common";
 import { EmpleadoEntity } from "./entities/empleado.entity";
-import { EntityManager, Repository } from "typeorm";
 import { CreateEmpleadoDto } from "./dto/create-empleado.dto";
+import { Repository } from "typeorm";
 
 @Injectable()
 export class EmpleadoService {
@@ -11,7 +11,6 @@ export class EmpleadoService {
   constructor(
     @InjectRepository(EmpleadoEntity)
     private empleadoRepository: Repository<EmpleadoEntity>,
-    private entityManager: EntityManager,
   ) {}
 
   async create(createEmpleadoDto: CreateEmpleadoDto) {
@@ -29,17 +28,17 @@ export class EmpleadoService {
     return empleadop;
   }
 
-  async update(id, updateEmpleadoDto: UpdateEmpleadoDto) {
-    const empleado = await this.empleadoRepository.findOne(id);
+  async update(id: string, updateEmpleadoDto: UpdateEmpleadoDto): Promise<EmpleadoEntity> {
+    const empleado = await this.empleadoRepository.findOne({ where: { id } });
     if (!empleado) {
-      throw new Error(`Empleado con ID ${id} no encontrado`);
+      // Manejo de error si el jugador no existe
+      throw new Error('El jugador con ID ${id} no fue encontrado');
     }
 
-    // Actualiza los campos del empleado con los datos del DTO
-    Object.assign(empleado, updateEmpleadoDto);
-
+    // Actualizar el jugador con los datos del DTO
+    this.empleadoRepository.merge(empleado, updateEmpleadoDto);
     return await this.empleadoRepository.save(empleado);
-  }
+  }
 
   async delete(id: string) {
     let empleado = await this.findOne(id);

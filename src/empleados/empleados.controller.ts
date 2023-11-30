@@ -23,9 +23,9 @@ export class EmpleadosController {
   }
 
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateEmpleadoDto: UpdateEmpleadoDto) {
-    return this.empleadosService.update(id, updateEmpleadoDto);
-  }
+  update(@Param('id') id: string, @Body() updateJugadorDto: UpdateEmpleadoDto) {
+    return this.empleadosService.update(id, updateJugadorDto);
+  }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
