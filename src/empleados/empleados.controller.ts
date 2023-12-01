@@ -18,17 +18,17 @@ export class EmpleadosController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: number) {
     return this.empleadosService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateJugadorDto: UpdateEmpleadoDto) {
+  update(@Param('id') id: number, @Body() updateJugadorDto: UpdateEmpleadoDto) {
     return this.empleadosService.update(id, updateJugadorDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: number) {
     return this.empleadosService.delete(id);
   }
 }

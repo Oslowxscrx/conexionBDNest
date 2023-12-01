@@ -22,13 +22,13 @@ export class EmpleadoService {
     return await this.empleadoRepository.find(); // Devuelve todos los empleados
   }
 
-  async findOne(id:string) {
+  async findOne(id:number) {
     const empleadop = await this.empleadoRepository.findOne({ where: {id} });
 
     return empleadop;
   }
 
-  async update(id: string, updateEmpleadoDto: UpdateEmpleadoDto): Promise<EmpleadoEntity> {
+  async update(id: number, updateEmpleadoDto: UpdateEmpleadoDto): Promise<EmpleadoEntity> {
     const empleado = await this.empleadoRepository.findOne({ where: { id } });
     if (!empleado) {
       // Manejo de error si el jugador no existe
@@ -40,7 +40,7 @@ export class EmpleadoService {
     return await this.empleadoRepository.save(empleado);
   }
 
-  async delete(id: string) {
+  async delete(id: number) {
     let empleado = await this.findOne(id);
     if(empleado){
       const empleados = this.empleadoRepository.delete({id});

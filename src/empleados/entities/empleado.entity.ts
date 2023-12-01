@@ -1,10 +1,11 @@
 export {Entity} from "typeorm"
+import { ActivoEntity } from "src/activos/entities/activo.entity";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class EmpleadoEntity {
     @PrimaryGeneratedColumn('increment')
-    id:string;
+    id:number;
     @Column('varchar', {
         name: 'nombre',
         nullable: false,
@@ -32,4 +33,7 @@ export class EmpleadoEntity {
         comment: 'email empleado'
     })
     email: string
+
+    @OneToMany(() => ActivoEntity, activo => activo.empleadoId)
+    activos:ActivoEntity[];
 }

@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { EmpleadosModule } from './empleados/empleados.module';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ActivosModule } from './activos/activos.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       autoLoadEntities:true, //carge automaticamente las entidades
       synchronize:true //en produccion se debe poner falso
     }),
+    ActivosModule,
   ],
   controllers: [AppController],
   providers: [AppService],
