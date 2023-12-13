@@ -6,6 +6,7 @@ import { BeforeInsert, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 
 export class ActivoEntity {
     @PrimaryGeneratedColumn('increment')
     id:number;
+    
     @Column('numeric', {
         name: 'codigo',
         nullable: false,
@@ -34,8 +35,9 @@ export class ActivoEntity {
     })
     vidaUtil: number  
 
-    @ManyToOne(() => EmpleadoEntity, empleadoId => empleadoId.activos)
-    empleadoId: EmpleadoEntity;
+    @ManyToOne(() => EmpleadoEntity, (empleado) => empleado.nombreActivo)
+
+    Empleado: EmpleadoEntity
 
    
 

@@ -1,7 +1,8 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from "@nestjs/common";
 import { EmpleadoService } from "./empleados.service";
 import { CreateEmpleadoDto } from "./dto/create-empleado.dto";
 import { UpdateEmpleadoDto } from "./dto/update-empleado.dto";
+import { PaginacionDto } from "src/common/dto/paginacion.dto";
 
 @Controller('empleados')
 export class EmpleadosController {
@@ -13,8 +14,8 @@ export class EmpleadosController {
   }
 
   @Get()
-  async findAll() {
-    return this.empleadosService.findAll();
+  findAll(@Query()paginacionDto: PaginacionDto) {
+    return this.empleadosService.findAll(paginacionDto);
   }
 
   @Get(':id')

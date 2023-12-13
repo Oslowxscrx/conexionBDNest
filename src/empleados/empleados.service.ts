@@ -1,9 +1,11 @@
 import { InjectRepository } from "@nestjs/typeorm";
 import { UpdateEmpleadoDto } from "./dto/update-empleado.dto";
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotAcceptableException } from "@nestjs/common";
 import { EmpleadoEntity } from "./entities/empleado.entity";
 import { CreateEmpleadoDto } from "./dto/create-empleado.dto";
 import { Repository } from "typeorm";
+import { ActivoEntity } from "src/empleados/entities/activo.entity";
+import { PaginacionDto } from "src/common/dto/paginacion.dto";
 
 @Injectable()
 export class EmpleadoService {
@@ -11,43 +13,71 @@ export class EmpleadoService {
   constructor(
     @InjectRepository(EmpleadoEntity)
     private empleadoRepository: Repository<EmpleadoEntity>,
+    @InjectRepository(ActivoEntity)
+    private activosRepository: Repository<ActivoEntity>,
   ) {}
 
   async create(createEmpleadoDto: CreateEmpleadoDto) {
-    const empleado = this.empleadoRepository.create(createEmpleadoDto);
-    return await this.empleadoRepository.save(empleado);
-  }
+    try{
+      const {nombreActivo=[], ...empleadoDetalles} = createEmpleadoDto
+    const empleado = this.empleadoRepository.create(
 
-  async findAll() {
-    return await this.empleadoRepository.find(); // Devuelve todos los empleados
+      {
+        ...empleadoDetalles,
+        nombreActivo: nombreActivo.map(nombre => this.activosRepository.create({
+          codigo: 1,
+          nombreActivo: nombre,
+          descripcion: 'Descripción por defecto',
+          vidaUtil: 0,
+        }))
+      }
+    );
+    await this.empleadoRepository.save(empleado);
+    return {...empleado, nombreActivo}
+  } catch (error){
+    console.log(error)
+    throw new Error("No se pudo realizar el ingreso a la base")
+  }
+}
+
+  findAll(paginacionDto: PaginacionDto) {
+    const { limit= 10, offset=1 } = paginacionDto
+    return this.empleadoRepository.find({
+      take: limit,
+      skip: offset,
+      relations: {
+        nombreActivo: true
+      }
+    }); // Devuelve todos los empleados
   }
 
   async findOne(id:number) {
-    const empleadop = await this.empleadoRepository.findOne({ where: {id} });
+    const empleados = await this.empleadoRepository.findOneBy({ id });
 
-    return empleadop;
+    if(!empleados)
+    throw new NotAcceptableException(id)
+    return empleados;
   }
 
-  async update(id: number, updateEmpleadoDto: UpdateEmpleadoDto): Promise<EmpleadoEntity> {
-    const empleado = await this.empleadoRepository.findOne({ where: { id } });
-    if (!empleado) {
-      // Manejo de error si el jugador no existe
-      throw new Error('El jugador con ID ${id} no fue encontrado');
-    }
+  async update(id: number, updateEmpleadoDto: UpdateEmpleadoDto) {
+    const empleados = await this.empleadoRepository.preload({
+      id: id,
+      ...updateEmpleadoDto,
+      nombreActivo: []
+    })
+    if(!empleados)
+    throw new NotAcceptableException('no se puedo actualizar');
+  await this.empleadoRepository.save(empleados);
+  return empleados
+
+    
 
     // Actualizar el jugador con los datos del DTO
-    this.empleadoRepository.merge(empleado, updateEmpleadoDto);
-    return await this.empleadoRepository.save(empleado);
+    
   }
 
   async delete(id: number) {
-    let empleado = await this.findOne(id);
-    if(empleado){
-      const empleados = this.empleadoRepository.delete({id});
-      return "ya esta";
-    }
-    else{
-      return "no existe";
-    }
+    const empleados = await this.findOne(id);
+    this.empleadoRepository.delete(empleados)
   }
-  }
+}

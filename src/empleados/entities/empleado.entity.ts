@@ -1,5 +1,5 @@
 export {Entity} from "typeorm"
-import { ActivoEntity } from "src/activos/entities/activo.entity";
+import { ActivoEntity } from "src/empleados/entities/activo.entity";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
@@ -34,6 +34,10 @@ export class EmpleadoEntity {
     })
     email: string
 
-    @OneToMany(() => ActivoEntity, activo => activo.empleadoId)
-    activos:ActivoEntity[];
+    @OneToMany(() => ActivoEntity, activo => activo.Empleado,
+    {
+        cascade: true
+    }
+    )
+    nombreActivo?: ActivoEntity[]
 }
